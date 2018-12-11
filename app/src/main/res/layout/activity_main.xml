@@ -6,4 +6,11 @@
     android:layout_height="match_parent"
     tools:context="com.onzhou.sox4android.MainActivity">
 
+    <Button
+        android:id="@+id/btn_reverb"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:enabled="false"
+        android:onClick="onReverbClick" />
+
 </FrameLayout>

@@ -1,13 +1,17 @@
 #include <jni.h>
 #include <string>
+#include "native_sox.h"
 
-extern "C"
-JNIEXPORT jstring
+void Java_com_onzhou_sox4android_sox_NativeSox_reverb(JNIEnv *env, jobject obj, jstring jinput,
+                                                      jstring joutput) {
 
-JNICALL
-Java_com_onzhou_sox4android_MainActivity_stringFromJNI(
-        JNIEnv *env,
-        jobject /* this */) {
-    std::string hello = "Hello from C++";
-    return env->NewStringUTF(hello.c_str());
+    const char *inputPath = env->GetStringUTFChars(jinput, NULL);
+    const char *outputPath = env->GetStringUTFChars(joutput, NULL);
+
+    AudioEffect audioEffect;
+    audioEffect.Reverb(inputPath, outputPath);
+
+    env->ReleaseStringUTFChars(jinput, inputPath);
+    env->ReleaseStringUTFChars(joutput, outputPath);
+
 }
