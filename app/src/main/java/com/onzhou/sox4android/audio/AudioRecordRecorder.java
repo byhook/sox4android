@@ -159,38 +159,9 @@ public class AudioRecordRecorder implements IAudioRecorder, OnEncodeListener {
     public void onEncodeAACBuffer(byte[] data) {
         try {
 
-            if (baos == null) {
-                baos = new ByteArrayOutputStream();
-            }
-            //积累到32k数据量再转换
-            baos.write(data, 0, data.length);
-            baos.flush();
-            length += data.length;
-            if (length >= 528 * 1024) {
-                length = 0;
-
-
-                FileOutputStream segmentFos = new FileOutputStream(new File(tempPath));
-
-                long totalAudioLen = 0;
-                long totalDataLen = totalAudioLen + 36;
-                long longSampleRate = 44100;
-                int channels = mChannels;
-                long byteRate = 16 * longSampleRate * channels / 8;
-                //写wav头部
-                byte[] header = mWavEncoder.writeWavHeader(totalAudioLen, totalDataLen, longSampleRate, channels, byteRate);
-                segmentFos.write(header, 0, 44);
-
-
-                baos.close();
-                baos = null;
-
-                //转换一次
-                mNativeSox.reverbFile(tempPath, outPath + System.currentTimeMillis() + ".wav",
-                        50, 50, 90, 50,
-                        30);
-            }
-
+            //byte[] outBuffer = new byte[data.length * 2];
+            //转换一次
+            //mNativeSox.reverbBuffer(data, data.length, outBuffer);
 
         } catch (Exception e) {
             e.printStackTrace();

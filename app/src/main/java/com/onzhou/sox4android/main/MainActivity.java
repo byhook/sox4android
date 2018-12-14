@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements AssertReleaseTask
         setContentView(R.layout.activity_main);
         setupButton();
         applyPermissions();
-        AssertReleaseTask videoReleaseTask = new AssertReleaseTask(this, "input.pcm", this);
+        AssertReleaseTask videoReleaseTask = new AssertReleaseTask(this, "song.wav", this);
         videoReleaseTask.execute();
     }
 
