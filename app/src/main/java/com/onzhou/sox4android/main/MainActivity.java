@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.onzhou.sox4android.R;
 import com.onzhou.sox4android.audio.AudioRecordRecorder;
+import com.onzhou.sox4android.audio.AudioTrackManager;
 import com.onzhou.sox4android.audio.IAudioRecorder;
 import com.onzhou.sox4android.audio.WavEncoder;
 import com.onzhou.sox4android.sox.NativeSox;
@@ -39,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements AssertReleaseTask
         setContentView(R.layout.activity_main);
         setupButton();
         applyPermissions();
-        AssertReleaseTask videoReleaseTask = new AssertReleaseTask(this, "song.wav", this);
+        AssertReleaseTask videoReleaseTask = new AssertReleaseTask(this, "input.pcm", this);
         videoReleaseTask.execute();
     }
 
@@ -104,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements AssertReleaseTask
         if (!startRecord) {
             startRecord = true;
             if (mAudioRecorder == null) {
-                File outputFile = new File(getExternalFilesDir(null), "output.wav");
+                File outputFile = new File(getExternalFilesDir(null), "output.pcm");
                 File tempFile = new File(getExternalFilesDir(null), "/temp.wav");
                 mAudioRecorder = new AudioRecordRecorder(outputFile.getAbsolutePath(), tempFile.getAbsolutePath());
                 mAudioRecorder.initRecorder();
@@ -129,8 +130,8 @@ public class MainActivity extends AppCompatActivity implements AssertReleaseTask
     }
 
     public void onMixAudioClick(View view) {
-        File file = new File(getExternalFilesDir(null), "output.wav");
-        //AudioTrackManager.getInstance().startPlay(file.getAbsolutePath());
+        File file = new File(getExternalFilesDir(null), "output.pcm");
+        AudioTrackManager.getInstance().startPlay(file.getAbsolutePath());
     }
 
     class ReverbTask extends AsyncTask<Void, Void, Void> {
@@ -150,8 +151,8 @@ public class MainActivity extends AppCompatActivity implements AssertReleaseTask
         @Override
         protected Void doInBackground(Void... voids) {
             NativeSox nativeSox = new NativeSox();
-            File inputFile = new File(getExternalFilesDir(null), "song.wav");
-            File outputFile = new File(getExternalFilesDir(null), "output.wav");
+            File inputFile = new File(getExternalFilesDir(null), "input.pcm");
+            File outputFile = new File(getExternalFilesDir(null), "output.pcm");
 
             nativeSox.reverbFile(inputFile.getAbsolutePath(), outputFile.getAbsolutePath(), audioParam.reverbrance, audioParam.hfDamping, audioParam.roomScale, audioParam.stereoDepth, audioParam.preDelay);
             return null;

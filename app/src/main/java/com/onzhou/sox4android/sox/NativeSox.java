@@ -13,6 +13,6 @@ public class NativeSox {
 
     public native void reverbFile(String inputPath, String outputPath, int reverbrance, int damping, int roomScale, int stereoDepth, int predelay);
 
-    public native void reverbBuffer(byte[] buffer, int length, byte[] outBuffer);
+    public native byte[] reverbBuffer(byte[] buffer, int length, byte[] outBuffer);
 
 }

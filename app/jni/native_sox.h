@@ -18,7 +18,7 @@ JNIEXPORT void JNICALL reverbFile(JNIEnv *env, jobject obj, jstring jinput,
  * 内存中转换由于NDK在23以上才支持fmemopen函数
  * 因此此方法暂时不可用
  */
-JNIEXPORT void JNICALL reverbBuffer
+JNIEXPORT jbyteArray JNICALL reverbBuffer
         (JNIEnv *, jobject, jbyteArray, jint, jbyteArray);
 
 #ifdef __cplusplus

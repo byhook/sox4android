@@ -4,6 +4,7 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.onzhou.sox4android.sox.NativeSox;
 
@@ -153,15 +154,15 @@ public class AudioRecordRecorder implements IAudioRecorder, OnEncodeListener {
         }
     }
 
-    int length = 0;
-    ByteArrayOutputStream baos;
-
     public void onEncodeAACBuffer(byte[] data) {
         try {
-
-            //byte[] outBuffer = new byte[data.length * 2];
             //转换一次
-            //mNativeSox.reverbBuffer(data, data.length, outBuffer);
+            byte[] outputBuffer = new byte[data.length * 2];
+            byte[] outBuffer = mNativeSox.reverbBuffer(data, data.length, outputBuffer);
+            outputStream.write(outBuffer, 0, outBuffer.length);
+
+            Log.d(TAG, "LENGTH=" + data.length + " " + outBuffer.length);
+            //outputStream.write(data, 0, data.length);
 
         } catch (Exception e) {
             e.printStackTrace();
