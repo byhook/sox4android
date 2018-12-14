@@ -11,6 +11,8 @@ public class NativeSox {
         System.loadLibrary("native-sox");
     }
 
-    public native void reverb(String inputPath, String outputPath);
+    public native void reverbFile(String inputPath, String outputPath, int reverbrance, int damping, int roomScale, int stereoDepth, int predelay);
+
+    public native void reverbBuffer(byte[] buffer, int length, byte[] outBuffer);
 
 }

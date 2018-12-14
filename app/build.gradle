@@ -4,19 +4,12 @@ android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.onzhou.sox4android"
-        minSdkVersion 14
+        minSdkVersion 16
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        externalNativeBuild {
-            cmake {
-                cppFlags ""
-            }
-            ndk {
-                abiFilters "armeabi-v7a"
-            }
-        }
+
         sourceSets {
             main {
                 jniLibs.srcDirs = ['libs']
@@ -27,11 +20,6 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
-    externalNativeBuild {
-        cmake {
-            path "CMakeLists.txt"
         }
     }
 }

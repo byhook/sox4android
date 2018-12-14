@@ -1,16 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.onzhou.sox4android.MainActivity">
+    android:orientation="vertical"
+    tools:context="com.onzhou.sox4android.main.MainActivity">
 
     <Button
         android:id="@+id/btn_reverb"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:enabled="false"
-        android:onClick="onReverbClick" />
+        android:onClick="onReverbClick"
+        android:text="开始转换" />
 
-</FrameLayout>
+    <Button
+        android:id="@+id/btn_record_audio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onRecordStart"
+        android:text="开始录音" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onMixAudioClick"
+        android:text="播放混响" />
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="混响大小" />
+    <!--混响大小-->
+    <SeekBar
+        android:id="@+id/seek_bar_reverbrance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:max="100"
+        android:min="0"
+        android:progress="50" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="高频阻尼" />
+    <!--高频阻尼-->
+    <SeekBar
+        android:id="@+id/seek_bar_hfDamping"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:max="100"
+        android:min="0"
+        android:progress="50" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="房间大小" />
+    <!--房间大小-->
+    <SeekBar
+        android:id="@+id/seek_bar_roomScale"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:max="100"
+        android:min="0"
+        android:progress="90" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="立体声深度" />
+    <!--立体声深度-->
+    <SeekBar
+        android:id="@+id/seek_bar_stereoDepth"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:max="100"
+        android:min="0"
+        android:progress="50" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="早反射声的时间" />
+    <!--早反射声的时间-->
+    <SeekBar
+        android:id="@+id/seek_bar_preDelay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:max="100"
+        android:min="0"
+        android:progress="30" />
+
+
+</LinearLayout>
