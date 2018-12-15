@@ -49,10 +49,10 @@ JNIEXPORT jbyteArray JNICALL setAudioEffectBuffer(JNIEnv *env, jobject instance,
         LOG_I("sox_open_mem_read fail");
         goto end;
     }
-    LOG_I("open mem success");
-    LOG_I("encoding info=%d,filetype=%s",in->encoding.encoding,in->filetype);
+    //LOG_I("open mem success");
+    //LOG_I("encoding info=%d,filetype=%s",in->encoding.encoding,in->filetype);
     //out = sox_open_mem_write(bufferptr, length, &in->signal, NULL, "sox", NULL);
-    out = sox_open_memstream_write(&bufferptr, &buffer_size, &in_sig, &in_enc, "sox", NULL);
+    out = sox_open_memstream_write(&bufferptr, &buffer_size, &in_sig, &in_enc, "s16", NULL);
     if (!out){
         LOG_I("sox_open_mem_write fail xxxxx");
         goto end;
@@ -66,34 +66,38 @@ JNIEXPORT jbyteArray JNICALL setAudioEffectBuffer(JNIEnv *env, jobject instance,
     LOG_I("mem buffer %08X %d",bufferptr,number_read);*/
 
     chain = sox_create_effects_chain(&in->encoding, &out->encoding);
-    char *args[10];
+    //char *args[10];
     ret = initEffect(in, out,chain, e, ret);
     if (ret!=0){
-        LOG_I("init effect error");
+        LOG_I("init effect error: %d", ret);
     }
     /*ret = echoEffect(in,out, chain, e, ret);
     if (ret!=0){
          LOG_I("echo effect error");
-     }*/
+     }
      ret = reverbEffect(in,out, chain, e, ret);
      if (ret!=0){
-         LOG_I("reverb effect error");
+         LOG_I("reverb effect error: %d", ret);
      }
+     */
 
     ret = releaseEffect(in, out, chain, e, ret);
     if (ret!=0){
-        LOG_I("mem release effect error");
+        LOG_I("mem release effect error: %d", ret);
     }
+
     //让整个效果器链运行起来
     ret = sox_flow_effects(chain, NULL, NULL);
      if (ret!=0){
-         LOG_I("mem sox_flow_effects error");
+         LOG_I("mem sox_flow_effects error: %d", ret);
      }
+
     //sox_flow_effects执行完毕整个流程也就结束了，销毁资源
     //memset(resultbytes,0,length);
     //memcpy(bufferptr,bytes, length);
 
-    LOG_I("mem copy complete %d",length);
+    //LOG_I("mem copy complete %d",length);
+
     sox_delete_effects_chain(chain);
     sox_close(out);
     sox_close(in);
@@ -101,12 +105,16 @@ JNIEXPORT jbyteArray JNICALL setAudioEffectBuffer(JNIEnv *env, jobject instance,
 
     end:
 
-    LOG_I("mem buffer %d %d %d %d      buffer_size=%d",bufferptr[0],bufferptr[1],bufferptr[2],bufferptr[3],buffer_size);
-    LOG_I("mem buffer %d %d %d %d",bytes[0],bytes[1],bytes[2],bytes[3]);
+    LOG_I("mem buffer %d %d %d %d      buffer_size=%d length=%d",bufferptr[0],bufferptr[1],bufferptr[2],bufferptr[3],buffer_size, length);
+    //LOG_I("mem buffer %d %d %d %d",bytes[0],bytes[1],bytes[2],bytes[3]);
     env->ReleaseByteArrayElements(bytes_, bytes, 0);
-    jbyteArray jshortArray1 = env->NewByteArray(length);
-    env->SetByteArrayRegion(jshortArray1, 0, length, (jbyte*)bufferptr);
+    jbyteArray jshortArray1 = env->NewByteArray(buffer_size);
+    env->SetByteArrayRegion(jshortArray1, 0, buffer_size, (jbyte*)bufferptr);
     //delete resultbytes;
+    //LOG_I("mem copy complete %d",length);
+    
+    free(bufferptr);
+
     return jshortArray1;
 }
 
