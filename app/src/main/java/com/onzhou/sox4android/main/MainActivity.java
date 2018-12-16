@@ -21,6 +21,8 @@ import com.onzhou.sox4android.sox.NativeSox;
 import com.onzhou.sox4android.task.AssertReleaseTask;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 
 public class MainActivity extends AppCompatActivity implements AssertReleaseTask.ReleaseCallback {
 
@@ -40,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements AssertReleaseTask
         setContentView(R.layout.activity_main);
         setupButton();
         applyPermissions();
-        AssertReleaseTask videoReleaseTask = new AssertReleaseTask(this, "input.pcm", this);
+        AssertReleaseTask videoReleaseTask = new AssertReleaseTask(this, "song.wav", this);
         videoReleaseTask.execute();
     }
 
@@ -105,9 +107,8 @@ public class MainActivity extends AppCompatActivity implements AssertReleaseTask
         if (!startRecord) {
             startRecord = true;
             if (mAudioRecorder == null) {
-                File outputFile = new File(getExternalFilesDir(null), "output.pcm");
-                File tempFile = new File(getExternalFilesDir(null), "/temp.wav");
-                mAudioRecorder = new AudioRecordRecorder(outputFile.getAbsolutePath(), tempFile.getAbsolutePath());
+                File outputFile = new File(getExternalFilesDir(null), "result.pcm");
+                mAudioRecorder = new AudioRecordRecorder(outputFile.getAbsolutePath(), getExternalFilesDir(null).getAbsolutePath());
                 mAudioRecorder.initRecorder();
             }
             mAudioRecorder.recordStart();
@@ -130,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements AssertReleaseTask
     }
 
     public void onMixAudioClick(View view) {
-        File file = new File(getExternalFilesDir(null), "output.pcm");
+        File file = new File(getExternalFilesDir(null), "result.pcm");
         AudioTrackManager.getInstance().startPlay(file.getAbsolutePath());
     }
 
@@ -151,10 +152,11 @@ public class MainActivity extends AppCompatActivity implements AssertReleaseTask
         @Override
         protected Void doInBackground(Void... voids) {
             NativeSox nativeSox = new NativeSox();
-            File inputFile = new File(getExternalFilesDir(null), "input.pcm");
-            File outputFile = new File(getExternalFilesDir(null), "output.pcm");
+            File inputFile = new File(getExternalFilesDir(null), "input.wav");
+            File outputFile = new File(getExternalFilesDir(null), "output.wav");
 
             nativeSox.reverbFile(inputFile.getAbsolutePath(), outputFile.getAbsolutePath(), audioParam.reverbrance, audioParam.hfDamping, audioParam.roomScale, audioParam.stereoDepth, audioParam.preDelay);
+
             return null;
         }
 

@@ -70,14 +70,14 @@ void reverbFile(JNIEnv *env, jobject obj, jstring jinput,
     transfer(3, param);
     LOGE("################");*/
 
-    setAudioEffect(env,obj,jinput,joutput);
+    //setAudioEffect(env,obj,jinput,joutput);
 
-    /*AudioEffect *audioEffect = new AudioEffect();
+    AudioEffect *audioEffect = new AudioEffect();
 
     audioEffect->SetEffectParam(reverbrance, hfDamping, roomScale, stereoDepth, preDelay);
     audioEffect->ReverbFile(inputPath, outputPath);
 
-    delete audioEffect;*/
+    delete audioEffect;
 
     env->ReleaseStringUTFChars(jinput, inputPath);
     env->ReleaseStringUTFChars(joutput, outputPath);

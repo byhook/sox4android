@@ -39,6 +39,12 @@ public:
                           int stereoDepth,
                           int preDelay, int wetGain);
 
+    void Init();
+
+    int ReverbPCMFile(const char *inputFile, const char *outputFile);
+
+    void Destroy();
+
 };
 
 

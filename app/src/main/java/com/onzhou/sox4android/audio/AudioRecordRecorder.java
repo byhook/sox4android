@@ -8,14 +8,18 @@ import android.util.Log;
 
 import com.onzhou.sox4android.sox.NativeSox;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
 /**
@@ -95,7 +99,7 @@ public class AudioRecordRecorder implements IAudioRecorder, OnEncodeListener {
         }
         try {
             //bufferSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNEL, AUDIO_FORMAT);
-            bufferSize = 4096;
+            bufferSize = 128 * 1024;
             audioRecord = new AudioRecord(AUDIO_SOURCE, SAMPLE_RATE, CHANNEL, AUDIO_FORMAT, bufferSize);
         } catch (Exception e) {
             e.printStackTrace();
@@ -154,15 +158,56 @@ public class AudioRecordRecorder implements IAudioRecorder, OnEncodeListener {
         }
     }
 
+    private FileOutputStream tempStream;
+
     public void onEncodeAACBuffer(byte[] data) {
         try {
-            //转换一次
-            byte[] outputBuffer = new byte[data.length * 2];
-            byte[] outBuffer = mNativeSox.reverbBuffer(data, data.length, outputBuffer);
-            outputStream.write(outBuffer, 0, outBuffer.length);
 
-            Log.d(TAG, "LENGTH=" + data.length + " " + outBuffer.length);
-            //outputStream.write(data, 0, data.length);
+            File tempFile = new File(tempPath, "temp.in.wav");
+
+            tempStream = new FileOutputStream(tempFile);
+
+            // 填入参数，比特率等等。这里用的是16位单声道 44100 hz
+            WaveHeader wavHeader = new WaveHeader();
+            // 长度字段 = 内容的大小（TOTAL_SIZE) +
+            // 头部字段的大小(不包括前面4字节的标识符RIFF以及fileLength本身的4字节)
+            wavHeader.fileLength = bufferSize + (44 - 8);
+            wavHeader.FmtHdrLeth = 16;
+            wavHeader.BitsPerSample = 16;
+            wavHeader.Channels = 2;
+            wavHeader.FormatTag = 0x0001;
+            wavHeader.SamplesPerSec = 44100;
+            wavHeader.BlockAlign = (short) (wavHeader.Channels * wavHeader.BitsPerSample / 8);
+            wavHeader.AvgBytesPerSec = wavHeader.BlockAlign * wavHeader.SamplesPerSec;
+            wavHeader.DataHdrLeth = bufferSize;
+
+            byte[] header = wavHeader.getHeader();
+
+            //写wav头部
+            tempStream.write(header, 0, header.length);
+
+            tempStream.write(data);
+            tempStream.flush();
+            tempStream.close();
+
+            //混响
+            File outFile = new File(tempPath, "temp.out.wav");
+            mNativeSox.reverbFile(tempFile.getAbsolutePath(), outFile.getAbsolutePath(), 50, 50, 90, 50, 30);
+
+            //WAV转PCM输出文件
+            InputStream inStream = null;
+            byte[] buffer = new byte[1024 * 4];
+            inStream = new BufferedInputStream(new FileInputStream(outFile));
+            int size = inStream.read(buffer);
+            if (size != -1) {
+                outputStream.write(buffer, 44, size - 44);
+                size = inStream.read(buffer);
+            }
+            while (size != -1) {
+                outputStream.write(buffer);
+                size = inStream.read(buffer);
+            }
+            inStream.close();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -179,6 +224,8 @@ public class AudioRecordRecorder implements IAudioRecorder, OnEncodeListener {
                     outputStream = new FileOutputStream(pcmPath);
                 }
                 byte[] audioBuffer = new byte[bufferSize];
+
+
                 while (isRecording && audioRecord != null) {
                     int audioSampleSize = audioRecord.read(audioBuffer, 0, bufferSize);
                     if (audioSampleSize > 0) {
