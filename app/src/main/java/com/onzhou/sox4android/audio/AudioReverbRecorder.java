@@ -4,31 +4,25 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.onzhou.sox4android.sox.NativeSox;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.ByteBuffer;
 
 /**
  * @anchor: andy
  * @date: 18-12-1
  */
-public class AudioRecordRecorder implements IAudioRecorder, OnEncodeListener {
+public class AudioReverbRecorder implements IAudioRecorder, OnEncodeListener {
 
-    private static final String TAG = "AudioRecordRecorder";
+    private static final String TAG = "AudioReverbRecorder";
 
     private int AUDIO_SOURCE = MediaRecorder.AudioSource.MIC;
 
@@ -78,17 +72,15 @@ public class AudioRecordRecorder implements IAudioRecorder, OnEncodeListener {
 
     private NativeSox mNativeSox;
 
-    private String tempPath, outPath;
-    private int mChannels = 2;
-    private int mSampleRate = 44100;
-    private long byteRate;
+    private String tempPath;
 
-    public AudioRecordRecorder(String filePath, String tempPath) {
+    private ReverbParam mReverbParam;
+
+    public AudioReverbRecorder(String filePath, String tempPath) {
         this.tempPath = tempPath;
         this.mNativeSox = new NativeSox();
         this.pcmPath = filePath;
 
-        byteRate = mSampleRate * mChannels * 16 / 8;
         mWavEncoder = new WavEncoder();
     }
 
@@ -104,21 +96,38 @@ public class AudioRecordRecorder implements IAudioRecorder, OnEncodeListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        if (mNativeSox != null) {
+            mNativeSox.init();
+            setReverbParam(mReverbParam);
+        }
+    }
+
+    @Override
+    public void setReverbParam(ReverbParam reverbParam) {
+        this.mReverbParam = reverbParam;
+        if (mNativeSox != null && mReverbParam != null) {
+            mNativeSox.setReverbParam(reverbParam.reverbrance, reverbParam.hfDamping, reverbParam.roomScale, reverbParam.stereoDepth, reverbParam.preDelay, reverbParam.wetGain);
+        }
     }
 
     @Override
     public int recordStart() {
         if (isRecording) {
             return RECORD_STATE.STATE_RECORDING;
-        } else if (audioRecord != null && audioRecord.getState() == AudioRecord.STATE_INITIALIZED) {
-            try {
-                audioRecord.startRecording();
-                isRecording = true;
-                recordThread = new Thread(new AudioRecordRunnable());
-                recordThread.start();
-                return RECORD_STATE.STATE_SUCCESS;
-            } catch (Exception e) {
-                e.printStackTrace();
+        } else {
+            //重新初始化
+            initRecorder();
+            //查看状态
+            if (audioRecord != null && audioRecord.getState() == AudioRecord.STATE_INITIALIZED) {
+                try {
+                    audioRecord.startRecording();
+                    isRecording = true;
+                    recordThread = new Thread(new AudioRecordRunnable());
+                    recordThread.start();
+                    return RECORD_STATE.STATE_SUCCESS;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
         return RECORD_STATE.STATE_ERROR;
@@ -156,11 +165,14 @@ public class AudioRecordRecorder implements IAudioRecorder, OnEncodeListener {
             audioRecord.release();
             audioRecord = null;
         }
+        if (mNativeSox != null) {
+            mNativeSox.release();
+        }
     }
 
     private FileOutputStream tempStream;
 
-    public void onEncodeAACBuffer(byte[] data) {
+    public void onHandlePCMBuffer(byte[] data) {
         try {
 
             File tempFile = new File(tempPath, "temp.in.wav");
@@ -192,7 +204,7 @@ public class AudioRecordRecorder implements IAudioRecorder, OnEncodeListener {
 
             //混响
             File outFile = new File(tempPath, "temp.out.wav");
-            mNativeSox.reverbFile(tempFile.getAbsolutePath(), outFile.getAbsolutePath(), 50, 50, 90, 50, 30);
+            mNativeSox.reverbWavFile(tempFile.getAbsolutePath(), outFile.getAbsolutePath());
 
             //WAV转PCM输出文件
             InputStream inStream = null;
@@ -230,7 +242,7 @@ public class AudioRecordRecorder implements IAudioRecorder, OnEncodeListener {
                     int audioSampleSize = audioRecord.read(audioBuffer, 0, bufferSize);
                     if (audioSampleSize > 0) {
 
-                        onEncodeAACBuffer(audioBuffer);
+                        onHandlePCMBuffer(audioBuffer);
                     }
                 }
             } catch (FileNotFoundException e) {

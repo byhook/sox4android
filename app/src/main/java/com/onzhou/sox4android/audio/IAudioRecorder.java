@@ -20,6 +20,12 @@ public interface IAudioRecorder {
     void initRecorder();
 
     /**
+     * 设置混响参数
+     * @param reverbParam
+     */
+    void setReverbParam(ReverbParam reverbParam);
+
+    /**
      * 开始录制音频
      */
     int recordStart();

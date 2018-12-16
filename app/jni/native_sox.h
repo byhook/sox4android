@@ -8,17 +8,23 @@
 extern "C" {
 #endif
 
-JNIEXPORT void JNICALL reverbFile(JNIEnv *env, jobject obj, jstring jinput,
-                                  jstring joutput, jint reverbrance,
+
+JNIEXPORT void JNICALL init(JNIEnv *env, jobject obj);
+
+JNIEXPORT void JNICALL release(JNIEnv *env, jobject obj);
+
+JNIEXPORT void JNICALL setReverbParam(JNIEnv *env, jobject obj,jint reverbrance,
                                   jint hfDamping, jint roomScale,
                                   jint stereoDepth,
-                                  jint preDelay);
+                                  jint preDelay,jint wetGain);
+
+JNIEXPORT void JNICALL reverbWavFile(JNIEnv *env, jobject obj, jstring jinput,jstring joutput);
 
 /**
  * 内存中转换由于NDK在23以上才支持fmemopen函数
  * 因此此方法暂时不可用
  */
-JNIEXPORT jbyteArray JNICALL reverbBuffer
+JNIEXPORT jbyteArray JNICALL reverbPcmBuffer
         (JNIEnv *, jobject, jbyteArray, jint, jbyteArray);
 
 #ifdef __cplusplus

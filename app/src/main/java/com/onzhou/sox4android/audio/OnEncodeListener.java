@@ -6,6 +6,6 @@ package com.onzhou.sox4android.audio;
  */
 public interface OnEncodeListener {
 
-    void onEncodeAACBuffer(byte[] data);
+    void onHandlePCMBuffer(byte[] data);
 
 }

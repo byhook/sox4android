@@ -13,12 +13,13 @@
 
 
 void AudioEffect::SetEffectParam(int reverbrance, int hfDamping, int roomScale, int stereoDepth,
-                                 int preDelay) {
+                                 int preDelay,int wetGain) {
     this->reverBrance = reverbrance;
     this->hfDamping = hfDamping;
     this->roomScale = roomScale;
     this->stereoDepth = stereoDepth;
     this->preDelay = preDelay;
+    this->wetGain = wetGain;
 }
 
 int AudioEffect::ReverbFile(const char *inputFile, const char *outputFile) {

@@ -22,16 +22,19 @@
         android:text="开始录音" />
 
     <Button
+        android:id="@+id/btn_record_play"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="onMixAudioClick"
+        android:enabled="false"
         android:text="播放混响" />
 
 
     <TextView
+        android:id="@+id/reverb_tv_brance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="混响大小" />
+        android:text="混响大小 50" />
     <!--混响大小-->
     <SeekBar
         android:id="@+id/seek_bar_reverbrance"
@@ -43,9 +46,10 @@
         android:progress="50" />
 
     <TextView
+        android:id="@+id/reverb_tv_hfDamping"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="高频阻尼" />
+        android:text="高频阻尼 50" />
     <!--高频阻尼-->
     <SeekBar
         android:id="@+id/seek_bar_hfDamping"
@@ -57,9 +61,10 @@
         android:progress="50" />
 
     <TextView
+        android:id="@+id/reverb_tv_roomScale"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="房间大小" />
+        android:text="房间大小 90" />
     <!--房间大小-->
     <SeekBar
         android:id="@+id/seek_bar_roomScale"
@@ -71,9 +76,10 @@
         android:progress="90" />
 
     <TextView
+        android:id="@+id/reverb_tv_depth"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="立体声深度" />
+        android:text="立体声深度 50" />
     <!--立体声深度-->
     <SeekBar
         android:id="@+id/seek_bar_stereoDepth"
@@ -85,9 +91,10 @@
         android:progress="50" />
 
     <TextView
+        android:id="@+id/reverb_tv_predelay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="早反射声的时间" />
+        android:text="早反射声的时间 30" />
     <!--早反射声的时间-->
     <SeekBar
         android:id="@+id/seek_bar_preDelay"

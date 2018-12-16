@@ -18,6 +18,7 @@ private:
     int roomScale;
     int stereoDepth;
     int preDelay;
+    int wetGain;
 
     sox_format_t *in, *out;
     sox_effects_chain_t *chain;
@@ -26,7 +27,7 @@ private:
 public:
 
     void SetEffectParam(int reverbrance, int hfDamping, int roomScale, int stereoDepth,
-                        int preDelay);
+                        int preDelay,int wetGain);
 
     int ReverbFile(const char *inputFile, const char *outputFile);
 

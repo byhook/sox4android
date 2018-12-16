@@ -2,11 +2,8 @@
 #include <stdio.h>
 #include "native_sox.h"
 #include "audio_effect.h"
-#include "example5.h"
 #include <malloc.h>
 #include <assert.h>
-#include "memory.h"
-#include "native-lib.h"
 
 #include <android/log.h>
 
@@ -19,8 +16,11 @@
  * 动态注册
  */
 JNINativeMethod methods[] = {
-    {"reverbFile", "(Ljava/lang/String;Ljava/lang/String;IIIII)V", (void *) reverbFile},
-    {"reverbBuffer", "([BI[B)[B", (void *) reverbBuffer}
+    {"init", "()V", (void *) init},
+    {"release", "()V", (void *) release},
+    {"setReverbParam", "(IIIIII)V", (void *) setReverbParam},
+    {"reverbWavFile", "(Ljava/lang/String;Ljava/lang/String;)V", (void *) reverbWavFile},
+    {"reverbPcmBuffer", "([BI[B)[B", (void *) reverbPcmBuffer}
 };
 
 /**
@@ -54,12 +54,33 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     return JNI_VERSION_1_6;
 }
 
-AudioEffect *audioEffect = new AudioEffect();
-void reverbFile(JNIEnv *env, jobject obj, jstring jinput,
-        jstring joutput, jint reverbrance,
-        jint hfDamping, jint roomScale,
-        jint stereoDepth,
-        jint preDelay) {
+
+AudioEffect *audioEffect = NULL;
+
+void init(JNIEnv *env, jobject obj){
+     if(audioEffect==NULL){
+         audioEffect = new AudioEffect();
+     }
+}
+
+void release(JNIEnv *env, jobject obj){
+     if(audioEffect!=NULL){
+         delete audioEffect;
+         audioEffect = NULL;
+     }
+}
+
+void setReverbParam(JNIEnv *env, jobject obj, jint reverbrance,jint hfDamping, jint roomScale,
+                                                      jint stereoDepth,
+                                                      jint preDelay,
+                                                      jint wetGain) {
+    if(audioEffect!=NULL){
+         audioEffect->SetEffectParam(reverbrance, hfDamping, roomScale, stereoDepth, preDelay,wetGain);
+    }
+}
+
+
+void reverbWavFile(JNIEnv *env, jobject obj, jstring jinput,jstring joutput) {
 
     const char *inputPath = env->GetStringUTFChars(jinput, NULL);
     const char *outputPath = env->GetStringUTFChars(joutput, NULL);
@@ -72,12 +93,9 @@ void reverbFile(JNIEnv *env, jobject obj, jstring jinput,
 
     //setAudioEffect(env,obj,jinput,joutput);
 
-    AudioEffect *audioEffect = new AudioEffect();
-
-    audioEffect->SetEffectParam(reverbrance, hfDamping, roomScale, stereoDepth, preDelay);
-    audioEffect->ReverbFile(inputPath, outputPath);
-
-    delete audioEffect;
+    if(audioEffect!=NULL){
+         audioEffect->ReverbFile(inputPath, outputPath);
+    }
 
     env->ReleaseStringUTFChars(jinput, inputPath);
     env->ReleaseStringUTFChars(joutput, outputPath);
@@ -87,7 +105,7 @@ void reverbFile(JNIEnv *env, jobject obj, jstring jinput,
 #define MAX_SAMPLES (size_t)2048
 
 jbyteArray
-reverbBuffer(JNIEnv *env, jobject obj, jbyteArray inData, jint inSize, jbyteArray outData) {
+reverbPcmBuffer(JNIEnv *env, jobject obj, jbyteArray inData, jint inSize, jbyteArray outData) {
 
 
 
@@ -102,8 +120,9 @@ reverbBuffer(JNIEnv *env, jobject obj, jbyteArray inData, jint inSize, jbyteArra
 
     //initSox(env,obj);
     LOGE("reverbBuffer start");
-    return setAudioEffectBuffer(env,obj,inData,inSize,outData);
+    //return setAudioEffectBuffer(env,obj,inData,inSize,outData);
     //jbyteArray byteBuffer =  memorybuffer2(env, obj,inData);
     //closeSox(env,obj);
     //return byteBuffer;
+    return NULL;
 }

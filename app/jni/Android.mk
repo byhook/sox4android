@@ -21,10 +21,7 @@ LOCAL_SRC_FILES := \
   $(LOCAL_PATH)/src/fopencookie.c \
   $(LOCAL_PATH)/src/fmemopen.c \
   $(LOCAL_PATH)/audio_effect.cpp \
-  $(LOCAL_PATH)/example5.cpp \
-  $(LOCAL_PATH)/native_sox.cpp \
-  $(LOCAL_PATH)/memory.cpp \
-  $(LOCAL_PATH)/native-lib.cpp
+  $(LOCAL_PATH)/native_sox.cpp
 
 LOCAL_CFLAGS += -O3
 
